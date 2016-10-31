@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Slidecopy</string>
+    <string name="take_photo">Take photo</string>
+    <string name="enter_number">Enter a unique number</string>
 </resources>
