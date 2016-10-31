@@ -1,11 +1,13 @@
 package com.martindisch.slidecopy;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,11 +42,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mCode = (EditText) findViewById(R.id.etCode);
         mStatus = (TextView) findViewById(R.id.tvStatus);
         mProgress = (ProgressBar) findViewById(R.id.pbUpload);
+
+        SharedPreferences prefs = getSharedPreferences("slidecopy", MODE_PRIVATE);
+        String code = prefs.getString("code", "none");
+        if (code.contentEquals("none")) {
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setMaxRetriesAndTimeout(0, 0);
+            client.get(getString(R.string.code_url), new AsyncHttpResponseHandler() {
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                    String newCode = new String(responseBody);
+                    mCode.setText(newCode);
+                    storeCode();
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                    Log.e(getPackageName(), "Couldn't reach server for code");
+                }
+            });
+        } else {
+            mCode.setText(code);
+        }
     }
 
     @Override
     public void onClick(View view) {
         if (mCode.getText().length() > 0) {
+            storeCode();
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 mPhotoFile = new File(getExternalFilesDir(null), mCode.getText().toString() + ".jpg");
@@ -80,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             AsyncHttpClient client = new AsyncHttpClient();
             client.setMaxRetriesAndTimeout(3, 500);
-            client.post(getString(R.string.server_url), params, new AsyncHttpResponseHandler() {
+            client.post(getString(R.string.upload_url), params, new AsyncHttpResponseHandler() {
 
                 @Override
                 public void onProgress(long bytesWritten, long totalSize) {
@@ -110,6 +135,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mPhotoFile.delete();
                 }
             });
+        }
+    }
+
+    private void storeCode() {
+        SharedPreferences prefs = getSharedPreferences("slidecopy", MODE_PRIVATE);
+        if (!prefs.getString("code", "none").contentEquals(mCode.getText().toString())) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("code", mCode.getText().toString());
+            editor.apply();
         }
     }
 }
