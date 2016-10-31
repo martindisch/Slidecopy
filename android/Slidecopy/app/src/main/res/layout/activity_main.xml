@@ -23,6 +23,7 @@
             android:text="@string/enter_number" />
 
         <EditText
+            android:id="@+id/etCode"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
@@ -30,6 +31,7 @@
             android:inputType="number" />
 
         <Button
+            android:id="@+id/bPhoto"
             android:layout_width="120dp"
             android:layout_height="wrap_content"
             android:text="@string/take_photo" />

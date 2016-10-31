@@ -2,4 +2,6 @@
     <string name="app_name">Slidecopy</string>
     <string name="take_photo">Take photo</string>
     <string name="enter_number">Enter a unique number</string>
+    <string name="no_camera">No camera app installed</string>
+    <string name="no_file">Could not write to storage</string>
 </resources>
