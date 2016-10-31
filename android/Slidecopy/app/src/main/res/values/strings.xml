@@ -3,5 +3,9 @@
     <string name="take_photo">Take photo</string>
     <string name="enter_number">Enter a unique number</string>
     <string name="no_camera">No camera app installed</string>
-    <string name="no_file">Could not write to storage</string>
+    <string name="oh_no">Something terrible happened</string>
+    <string name="success">Upload complete</string>
+    <string name="failure">Upload failed</string>
+    <string name="uploading">Uploading…</string>
+    <string name="retrying">Upload failed, retry %1$d</string>
 </resources>

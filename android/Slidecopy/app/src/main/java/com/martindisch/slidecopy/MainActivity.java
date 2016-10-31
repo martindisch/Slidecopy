@@ -2,7 +2,6 @@ package com.martindisch.slidecopy;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
@@ -10,25 +9,37 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.RequestParams;
+
 import java.io.File;
-import java.io.IOException;
+import java.io.FileNotFoundException;
+
+import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
-    private Button mPhoto;
     private EditText mCode;
+    private TextView mStatus;
+    private ProgressBar mProgress;
+    private File mPhotoFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mPhoto = (Button) findViewById(R.id.bPhoto);
+        Button mPhoto = (Button) findViewById(R.id.bPhoto);
         mPhoto.setOnClickListener(this);
         mCode = (EditText) findViewById(R.id.etCode);
+        mStatus = (TextView) findViewById(R.id.tvStatus);
+        mProgress = (ProgressBar) findViewById(R.id.pbUpload);
     }
 
     @Override
@@ -36,20 +47,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mCode.getText().length() > 0) {
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                File photoFile = null;
-                try {
-                    photoFile = createImageFile(mCode.getText().toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(this, R.string.no_file, Toast.LENGTH_SHORT).show();
-                }
-                if (photoFile != null) {
-                    Uri photoURI = FileProvider.getUriForFile(this,
-                            "com.martindisch.fileprovider",
-                            photoFile);
-                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                }
+                mPhotoFile = new File(getExternalFilesDir(null), mCode.getText().toString() + ".jpg");
+                Uri photoURI = FileProvider.getUriForFile(this,
+                        "com.martindisch.fileprovider",
+                        mPhotoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
             } else {
                 Toast.makeText(this, R.string.no_camera, Toast.LENGTH_SHORT).show();
             }
@@ -58,7 +61,55 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private File createImageFile(String code) throws IOException {
-        return new File(getExternalFilesDir(null), code + ".jpg");
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            // gather your request parameters
+            RequestParams params = new RequestParams();
+            try {
+                params.put("file", mPhotoFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), R.string.oh_no, Toast.LENGTH_SHORT).show();
+            }
+
+            mProgress.setProgress(0);
+            mProgress.setVisibility(View.VISIBLE);
+            mStatus.setText(R.string.uploading);
+            mStatus.setVisibility(View.VISIBLE);
+
+            AsyncHttpClient client = new AsyncHttpClient();
+            client.setMaxRetriesAndTimeout(3, 500);
+            client.post(getString(R.string.server_url), params, new AsyncHttpResponseHandler() {
+
+                @Override
+                public void onProgress(long bytesWritten, long totalSize) {
+                    Long lProgress = 100 * bytesWritten / totalSize;
+                    int progress = lProgress.intValue();
+                    if (progress != mProgress.getProgress()) {
+                        mProgress.setProgress(progress);
+                    }
+                }
+
+                @Override
+                public void onSuccess(int statusCode, Header[] headers, byte[] bytes) {
+                    mProgress.setVisibility(View.INVISIBLE);
+                    mStatus.setText(R.string.success);
+                    mPhotoFile.delete();
+                }
+
+                @Override
+                public void onRetry(int retryNo) {
+                    mStatus.setText(getString(R.string.retrying, retryNo));
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers, byte[] bytes, Throwable throwable) {
+                    mProgress.setVisibility(View.INVISIBLE);
+                    mStatus.setText(R.string.failure);
+                    mPhotoFile.delete();
+                }
+            });
+        }
     }
 }
