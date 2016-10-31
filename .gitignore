@@ -1,5 +1,7 @@
 # User uploads
 server/upload
+# Persistent storage
+server/.node-persist
 
 ### node.js
 

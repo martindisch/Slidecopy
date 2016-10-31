@@ -1,6 +1,9 @@
 var express = require('express'),
     multer = require('multer'),
-    date = require('date-and-time');
+    date = require('date-and-time'),
+    pers = require('node-persist');
+    
+pers.init();
 
 var storage = multer.diskStorage({
     destination: 'upload',
@@ -14,7 +17,16 @@ var app = express();
 
 app.post('/upload', upload.single('file'), function(req, res) {
     dateLog('Received file ' + req.file.originalname);
-    res.status(200).send('File received');
+    res.send('File received');
+});
+
+app.get('/code', function(req, res) {
+    pers.getItem('currentCode', function(err, value) {
+        if (err || value == undefined) value = 1;
+        pers.setItem('currentCode', value + 1);
+        res.send(value.toString());
+        dateLog('Returned code ' + value);
+    });
 });
 
 app.listen(8080);
