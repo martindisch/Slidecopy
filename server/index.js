@@ -17,7 +17,7 @@ var app = express();
 
 app.post('/upload', upload.single('file'), function(req, res) {
     dateLog('Received file ' + req.file.originalname);
-    res.send('File received');
+    res.sendStatus(200);
 });
 
 app.get('/code', function(req, res) {
@@ -29,14 +29,17 @@ app.get('/code', function(req, res) {
     });
 });
 
-/*app.get('/photo/:filename', function(req, res) {
+app.get('/photo/:filename', function(req, res) {
     var filename = req.params.filename;
     res.download('upload/' + filename, function(err) {
-        // TODO: response for error
-        dateLog('served ' + filename);
+        if (err) {
+            res.sendStatus(404);
+            dateLog('Requested image ' + filename + ' not found');
+        } else {
+            dateLog('Served ' + filename);
+        }
     });
-});*/
-app.use('/photo', express.static('upload'));
+});
 
 app.listen(8080);
 dateLog('Server listening on 8080');
