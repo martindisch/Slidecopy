@@ -29,6 +29,15 @@ app.get('/code', function(req, res) {
     });
 });
 
+/*app.get('/photo/:filename', function(req, res) {
+    var filename = req.params.filename;
+    res.download('upload/' + filename, function(err) {
+        // TODO: response for error
+        dateLog('served ' + filename);
+    });
+});*/
+app.use('/photo', express.static('upload'));
+
 app.listen(8080);
 dateLog('Server listening on 8080');
 
