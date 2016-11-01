@@ -16,7 +16,6 @@ namespace Slidecopy
         {
             InitializeComponent();
             // initialize notifyIcon
-            notifyIcon.Icon = SystemIcons.Application;
             notifyIcon.DoubleClick += new EventHandler(notifyIcon_DoubleClick);
 
             // if they exist, load previously saved values from registry
