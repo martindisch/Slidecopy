@@ -32,9 +32,17 @@ namespace Slidecopy
                 gotData = true;
             } else
             {
-                // otherwise, let user enter required data
-                this.WindowState = FormWindowState.Normal;
+                // otherwise, show form to let user enter required data
+                Show();
             }
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            if (e.CloseReason != CloseReason.UserClosing) return;
+            // if the user closed the window, don't exit and hide instead
+            e.Cancel = true;
+            Hide();
         }
 
         void notifyIcon_DoubleClick(object sender, EventArgs e)
@@ -70,7 +78,7 @@ namespace Slidecopy
             } else
             {
                 // if no server settings available, show input form to user
-                this.WindowState = FormWindowState.Normal;
+                Show();
             }
         }
 
@@ -81,7 +89,8 @@ namespace Slidecopy
 
         private void toolStripMenuItemSettings_Click(object sender, EventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
+            // show form
+            Show();
         }
 
         private void buttonSave_Click(object sender, EventArgs e)
@@ -116,8 +125,8 @@ namespace Slidecopy
             regKey.SetValue("port", textBoxPort.Text);
             gotData = true;
 
-            // minimize
-            this.WindowState = FormWindowState.Minimized;
+            // hide the input form
+            Hide();
         }
     }
 }

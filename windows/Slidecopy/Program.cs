@@ -16,7 +16,9 @@ namespace Slidecopy
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new FormSettings());
+            FormSettings form = new FormSettings();
+            // Start with form hidden
+            Application.Run();
         }
     }
 }

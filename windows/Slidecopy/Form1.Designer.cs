@@ -152,13 +152,13 @@
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.textBoxCode);
             this.Controls.Add(this.labelCode);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FormSettings";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Slidecopy";
-            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.contextMenuStripIcon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
