@@ -40,6 +40,7 @@
             this.textBoxIP = new System.Windows.Forms.TextBox();
             this.labelPort = new System.Windows.Forms.Label();
             this.textBoxPort = new System.Windows.Forms.TextBox();
+            this.labelDoubleClick = new System.Windows.Forms.Label();
             this.contextMenuStripIcon.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -76,16 +77,16 @@
             this.labelCode.AutoSize = true;
             this.labelCode.Location = new System.Drawing.Point(13, 13);
             this.labelCode.Name = "labelCode";
-            this.labelCode.Size = new System.Drawing.Size(113, 13);
+            this.labelCode.Size = new System.Drawing.Size(166, 13);
             this.labelCode.TabIndex = 0;
-            this.labelCode.Text = "Unique code (Android)";
+            this.labelCode.Text = "Unique code (same as in Android)";
             // 
             // textBoxCode
             // 
             this.textBoxCode.Location = new System.Drawing.Point(16, 29);
             this.textBoxCode.Name = "textBoxCode";
             this.textBoxCode.Size = new System.Drawing.Size(110, 20);
-            this.textBoxCode.TabIndex = 1;
+            this.textBoxCode.TabIndex = 0;
             // 
             // buttonSave
             // 
@@ -100,7 +101,7 @@
             // labelIP
             // 
             this.labelIP.AutoSize = true;
-            this.labelIP.Location = new System.Drawing.Point(16, 56);
+            this.labelIP.Location = new System.Drawing.Point(13, 57);
             this.labelIP.Name = "labelIP";
             this.labelIP.Size = new System.Drawing.Size(51, 13);
             this.labelIP.TabIndex = 4;
@@ -111,7 +112,7 @@
             this.textBoxIP.Location = new System.Drawing.Point(16, 73);
             this.textBoxIP.Name = "textBoxIP";
             this.textBoxIP.Size = new System.Drawing.Size(110, 20);
-            this.textBoxIP.TabIndex = 5;
+            this.textBoxIP.TabIndex = 1;
             // 
             // labelPort
             // 
@@ -127,13 +128,23 @@
             this.textBoxPort.Location = new System.Drawing.Point(136, 73);
             this.textBoxPort.Name = "textBoxPort";
             this.textBoxPort.Size = new System.Drawing.Size(71, 20);
-            this.textBoxPort.TabIndex = 7;
+            this.textBoxPort.TabIndex = 2;
+            // 
+            // labelDoubleClick
+            // 
+            this.labelDoubleClick.Location = new System.Drawing.Point(13, 105);
+            this.labelDoubleClick.Name = "labelDoubleClick";
+            this.labelDoubleClick.Size = new System.Drawing.Size(194, 47);
+            this.labelDoubleClick.TabIndex = 7;
+            this.labelDoubleClick.Text = "Double click the icon in the notification area to copy your current photo to clip" +
+    "board";
             // 
             // FormSettings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(221, 109);
+            this.ClientSize = new System.Drawing.Size(221, 161);
+            this.Controls.Add(this.labelDoubleClick);
             this.Controls.Add(this.textBoxPort);
             this.Controls.Add(this.labelPort);
             this.Controls.Add(this.textBoxIP);
@@ -144,8 +155,10 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.Name = "FormSettings";
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Slidecopy";
+            this.WindowState = System.Windows.Forms.FormWindowState.Minimized;
             this.contextMenuStripIcon.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -165,6 +178,7 @@
         private System.Windows.Forms.TextBox textBoxIP;
         private System.Windows.Forms.Label labelPort;
         private System.Windows.Forms.TextBox textBoxPort;
+        private System.Windows.Forms.Label labelDoubleClick;
     }
 }
 
