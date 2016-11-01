@@ -83,6 +83,9 @@ namespace Slidecopy
 
         private void toolStripMenuItemExit_Click(object sender, EventArgs e)
         {
+            // make sure it doesn't buggily hang around after the application is closed - thanks Windows!
+            notifyIcon.Visible = false;
+            // exit
             System.Windows.Forms.Application.Exit();
         }
 
