@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Log.e(getPackageName(), "Couldn't reach server for code");
+                    Log.e("CodeGen", "Couldn't reach server for code");
                 }
             });
         } else {
