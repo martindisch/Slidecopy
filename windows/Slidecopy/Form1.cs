@@ -20,7 +20,7 @@ namespace Slidecopy
             // initialize notifyIcon
             notifyIcon.DoubleClick += new EventHandler(notifyIcon_DoubleClick);
 
-            // if they exist, load previously saved values from registry
+            // if it exists, load previously saved code from registry
             RegistryKey regKey = Registry.CurrentUser.OpenSubKey(@"Software\Slidecopy");
             if (regKey != null)
             {
@@ -29,7 +29,7 @@ namespace Slidecopy
                 gotCode = true;
             } else
             {
-                // otherwise, show form to let user enter required data
+                // otherwise, show form to let user enter the code
                 Show();
             }
         }
@@ -78,7 +78,7 @@ namespace Slidecopy
                 }
             } else
             {
-                // if no server settings available, show input form to user
+                // if no code has been saved, show input form to user
                 Show();
             }
         }
@@ -109,7 +109,7 @@ namespace Slidecopy
                 return;
             }
 
-            // save values to registry
+            // save code to registry
             RegistryKey regKey = Registry.CurrentUser.CreateSubKey(@"Software\Slidecopy");
             regKey.SetValue("code", textBoxCode.Text);
             gotCode = true;

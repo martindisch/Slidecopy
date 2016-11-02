@@ -30,30 +30,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mStatus;
     private ProgressBar mProgress;
     private File mPhotoFile;
+    private String code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        code = null;
 
+        // basic view initialization
         Button mPhoto = (Button) findViewById(R.id.bPhoto);
         mPhoto.setOnClickListener(this);
         mCode = (TextView) findViewById(R.id.tvCode);
         mStatus = (TextView) findViewById(R.id.tvStatus);
         mProgress = (ProgressBar) findViewById(R.id.pbUpload);
 
+        // try to load saved code
         SharedPreferences prefs = getSharedPreferences("slidecopy", MODE_PRIVATE);
-        String code = prefs.getString("code", "none");
-        if (code.contentEquals("none")) {
+        String loadedCode = prefs.getString("code", "none");
+        if (loadedCode.contentEquals("none")) {
             getCode(false);
         } else {
+            code = loadedCode;
             mCode.setText(code);
         }
     }
 
     @Override
     public void onClick(View view) {
-        if (!mCode.getText().toString().contentEquals(getString(R.string.no_code))) {
+        if (code != null) {
             takePicture();
         } else {
             getCode(true);
@@ -72,17 +77,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(getApplicationContext(), R.string.oh_no, Toast.LENGTH_SHORT).show();
             }
 
+            // initialize views for upload
             mProgress.setProgress(0);
             mProgress.setVisibility(View.VISIBLE);
             mStatus.setText(R.string.uploading);
             mStatus.setVisibility(View.VISIBLE);
 
+            // start uploading
             AsyncHttpClient client = new AsyncHttpClient();
             client.setMaxRetriesAndTimeout(3, 500);
             client.post(getString(R.string.upload_url), params, new AsyncHttpResponseHandler() {
 
                 @Override
                 public void onProgress(long bytesWritten, long totalSize) {
+                    // update progress bar
                     Long lProgress = 100 * bytesWritten / totalSize;
                     int progress = lProgress.intValue();
                     if (progress != mProgress.getProgress()) {
@@ -92,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, byte[] bytes) {
+                    // hide progressBar, inform user of success and delete photo
                     mProgress.setVisibility(View.INVISIBLE);
                     mStatus.setText(R.string.success);
                     mPhotoFile.delete();
@@ -104,6 +113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 @Override
                 public void onFailure(int statusCode, Header[] headers, byte[] bytes, Throwable throwable) {
+                    // hide progressBar, inform user of failure and delete photo
                     mProgress.setVisibility(View.INVISIBLE);
                     mStatus.setText(R.string.failure);
                     mPhotoFile.delete();
@@ -112,48 +122,71 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    /**
+     * Starts an Intent to take a photo using a preinstalled camera app and saving the picture
+     * in the apps private directory with the code as filename.
+     */
     private void takePicture() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        // check if there is a camera app installed
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            mPhotoFile = new File(getExternalFilesDir(null), mCode.getText().toString() + ".jpg");
+            // build the photo file
+            mPhotoFile = new File(getExternalFilesDir(null), code + ".jpg");
+            // get URI using a file provider
             Uri photoURI = FileProvider.getUriForFile(this,
                     "com.martindisch.fileprovider",
                     mPhotoFile);
+            // put URI into Intent
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            // send Intent
             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
         } else {
             Toast.makeText(this, R.string.no_camera, Toast.LENGTH_SHORT).show();
         }
     }
 
+    /**
+     * Contacts the server to get a unique code. Save and display the code on success, inform
+     * user on failure.
+     *
+     * @param takePicture   Whether or not to take a picture after a code has been received
+     */
     private void getCode(final boolean takePicture) {
         Toast.makeText(this, R.string.contacting_server, Toast.LENGTH_SHORT).show();
+        // make GET request
         AsyncHttpClient client = new AsyncHttpClient();
         client.setMaxRetriesAndTimeout(0, 0);
         client.get(getString(R.string.code_url), new AsyncHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                String newCode = new String(responseBody);
-                mCode.setText(newCode);
-                storeCode();
+                code = new String(responseBody);
+                // display new code
+                mCode.setText(code);
+                // store the code
+                storeCode(code);
                 Toast.makeText(getApplicationContext(), R.string.code_received, Toast.LENGTH_SHORT).show();
+                // if user got here by pressing 'take picture', take the picture
                 if (takePicture) takePicture();
             }
 
             @Override
             public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                // inform user of failure
                 mCode.setText(R.string.no_code);
                 Toast.makeText(getApplicationContext(), R.string.no_code_explanation, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void storeCode() {
+    /**
+     * Stores the code in SharedPreferences.
+     *
+     * @param code  the code to store
+     */
+    private void storeCode(String code) {
         SharedPreferences prefs = getSharedPreferences("slidecopy", MODE_PRIVATE);
-        if (!prefs.getString("code", "none").contentEquals(mCode.getText().toString())) {
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putString("code", mCode.getText().toString());
+            editor.putString("code", code);
             editor.apply();
-        }
     }
 }
