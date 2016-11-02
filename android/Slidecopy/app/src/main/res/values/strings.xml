@@ -1,11 +1,15 @@
 <resources>
     <string name="app_name">Slidecopy</string>
     <string name="take_photo">Take photo</string>
-    <string name="enter_number">Enter a unique number</string>
+    <string name="code">Your unique code</string>
     <string name="no_camera">No camera app installed</string>
     <string name="oh_no">Something terrible happened</string>
     <string name="success">Upload complete</string>
     <string name="failure">Upload failed</string>
     <string name="uploading">Uploading…</string>
     <string name="retrying">Upload failed, retry %1$d</string>
+    <string name="no_code">-</string>
+    <string name="no_code_explanation">Server unreachable</string>
+    <string name="contacting_server">Contacting server for code…</string>
+    <string name="code_received">Received code from server</string>
 </resources>

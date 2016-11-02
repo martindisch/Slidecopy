@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +25,8 @@ import cz.msebera.android.httpclient.Header;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    static final int REQUEST_IMAGE_CAPTURE = 1;
-    private EditText mCode;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private TextView mCode;
     private TextView mStatus;
     private ProgressBar mProgress;
     private File mPhotoFile;
@@ -39,28 +38,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Button mPhoto = (Button) findViewById(R.id.bPhoto);
         mPhoto.setOnClickListener(this);
-        mCode = (EditText) findViewById(R.id.etCode);
+        mCode = (TextView) findViewById(R.id.tvCode);
         mStatus = (TextView) findViewById(R.id.tvStatus);
         mProgress = (ProgressBar) findViewById(R.id.pbUpload);
 
         SharedPreferences prefs = getSharedPreferences("slidecopy", MODE_PRIVATE);
         String code = prefs.getString("code", "none");
         if (code.contentEquals("none")) {
-            AsyncHttpClient client = new AsyncHttpClient();
-            client.setMaxRetriesAndTimeout(0, 0);
-            client.get(getString(R.string.code_url), new AsyncHttpResponseHandler() {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
-                    String newCode = new String(responseBody);
-                    mCode.setText(newCode);
-                    storeCode();
-                }
-
-                @Override
-                public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
-                    Log.e("CodeGen", "Couldn't reach server for code");
-                }
-            });
+            getCode(false);
         } else {
             mCode.setText(code);
         }
@@ -68,21 +53,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
-        if (mCode.getText().length() > 0) {
-            storeCode();
-            Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                mPhotoFile = new File(getExternalFilesDir(null), mCode.getText().toString() + ".jpg");
-                Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.martindisch.fileprovider",
-                        mPhotoFile);
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-            } else {
-                Toast.makeText(this, R.string.no_camera, Toast.LENGTH_SHORT).show();
-            }
+        if (!mCode.getText().toString().contentEquals(getString(R.string.no_code))) {
+            takePicture();
         } else {
-            Toast.makeText(this, R.string.enter_number, Toast.LENGTH_SHORT).show();
+            getCode(true);
         }
     }
 
@@ -136,6 +110,42 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
         }
+    }
+
+    private void takePicture() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            mPhotoFile = new File(getExternalFilesDir(null), mCode.getText().toString() + ".jpg");
+            Uri photoURI = FileProvider.getUriForFile(this,
+                    "com.martindisch.fileprovider",
+                    mPhotoFile);
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        } else {
+            Toast.makeText(this, R.string.no_camera, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void getCode(final boolean takePicture) {
+        Toast.makeText(this, R.string.contacting_server, Toast.LENGTH_SHORT).show();
+        AsyncHttpClient client = new AsyncHttpClient();
+        client.setMaxRetriesAndTimeout(0, 0);
+        client.get(getString(R.string.code_url), new AsyncHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, byte[] responseBody) {
+                String newCode = new String(responseBody);
+                mCode.setText(newCode);
+                storeCode();
+                Toast.makeText(getApplicationContext(), R.string.code_received, Toast.LENGTH_SHORT).show();
+                if (takePicture) takePicture();
+            }
+
+            @Override
+            public void onFailure(int statusCode, Header[] headers, byte[] responseBody, Throwable error) {
+                mCode.setText(R.string.no_code);
+                Toast.makeText(getApplicationContext(), R.string.no_code_explanation, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void storeCode() {
