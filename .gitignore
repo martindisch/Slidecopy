@@ -2,6 +2,8 @@
 server/upload
 # Persistent storage
 server/.node-persist
+# creds.resx
+windows/Slidecopy/creds.resx
 
 ### node.js
 
