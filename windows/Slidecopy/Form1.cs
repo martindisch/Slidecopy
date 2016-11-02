@@ -4,13 +4,15 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using System.Text.RegularExpressions;
 using System.Net;
+using System.Resources;
+using System.Reflection;
 
 namespace Slidecopy
 {
     public partial class FormSettings : Form
     {
-        private bool gotData = false;
-        private string code, ip, port;
+        private bool gotCode = false;
+        private string code;
 
         public FormSettings()
         {
@@ -23,12 +25,8 @@ namespace Slidecopy
             if (regKey != null)
             {
                 code = (string) regKey.GetValue("code");
-                ip = (string) regKey.GetValue("ip");
-                port = (string) regKey.GetValue("port");
                 textBoxCode.Text = code;
-                textBoxIP.Text = ip;
-                textBoxPort.Text = port;
-                gotData = true;
+                gotCode = true;
             } else
             {
                 // otherwise, show form to let user enter required data
@@ -46,8 +44,12 @@ namespace Slidecopy
 
         void notifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            if (gotData)
+            if (gotCode)
             {
+                // get IP and port from creds.resx
+                ResourceManager rm = new ResourceManager(typeof(creds));
+                string ip = rm.GetString("server_ip");
+                string port = rm.GetString("server_port");
                 // build request
                 string url = @"http://" + ip + @":" + port + @"/photo/" + code + @".jpg";
                 WebRequest request = WebRequest.Create(url);
@@ -97,35 +99,20 @@ namespace Slidecopy
 
         private void buttonSave_Click(object sender, EventArgs e)
         {
-            gotData = false;
+            gotCode = false;
             // check input for errors
             code = textBoxCode.Text;
-            ip = textBoxIP.Text;
-            port = textBoxPort.Text;
             Regex rgxPositiveInt = new Regex(@"^[1-9]\d*$");
-            Regex rgxIP = new Regex(@"^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
             if (!rgxPositiveInt.IsMatch(code))
             {
                 MessageBox.Show("Invalid code", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (!rgxIP.IsMatch(ip))
-            {
-                MessageBox.Show("Invalid IP address", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (!rgxPositiveInt.IsMatch(port))
-            {
-                MessageBox.Show("Invalid port", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
             // save values to registry
             RegistryKey regKey = Registry.CurrentUser.CreateSubKey(@"Software\Slidecopy");
             regKey.SetValue("code", textBoxCode.Text);
-            regKey.SetValue("ip", textBoxIP.Text);
-            regKey.SetValue("port", textBoxPort.Text);
-            gotData = true;
+            gotCode = true;
 
             // hide the input form
             Hide();

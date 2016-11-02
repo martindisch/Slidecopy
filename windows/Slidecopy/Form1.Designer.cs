@@ -37,10 +37,6 @@
             this.labelCode = new System.Windows.Forms.Label();
             this.textBoxCode = new System.Windows.Forms.TextBox();
             this.buttonSave = new System.Windows.Forms.Button();
-            this.labelIP = new System.Windows.Forms.Label();
-            this.textBoxIP = new System.Windows.Forms.TextBox();
-            this.labelPort = new System.Windows.Forms.Label();
-            this.textBoxPort = new System.Windows.Forms.TextBox();
             this.labelDoubleClick = new System.Windows.Forms.Label();
             this.contextMenuStripIcon.SuspendLayout();
             this.SuspendLayout();
@@ -100,41 +96,9 @@
             this.buttonSave.UseVisualStyleBackColor = true;
             this.buttonSave.Click += new System.EventHandler(this.buttonSave_Click);
             // 
-            // labelIP
-            // 
-            this.labelIP.AutoSize = true;
-            this.labelIP.Location = new System.Drawing.Point(13, 57);
-            this.labelIP.Name = "labelIP";
-            this.labelIP.Size = new System.Drawing.Size(51, 13);
-            this.labelIP.TabIndex = 4;
-            this.labelIP.Text = "Server IP";
-            // 
-            // textBoxIP
-            // 
-            this.textBoxIP.Location = new System.Drawing.Point(16, 73);
-            this.textBoxIP.Name = "textBoxIP";
-            this.textBoxIP.Size = new System.Drawing.Size(110, 20);
-            this.textBoxIP.TabIndex = 1;
-            // 
-            // labelPort
-            // 
-            this.labelPort.AutoSize = true;
-            this.labelPort.Location = new System.Drawing.Point(133, 56);
-            this.labelPort.Name = "labelPort";
-            this.labelPort.Size = new System.Drawing.Size(59, 13);
-            this.labelPort.TabIndex = 6;
-            this.labelPort.Text = "Server port";
-            // 
-            // textBoxPort
-            // 
-            this.textBoxPort.Location = new System.Drawing.Point(136, 73);
-            this.textBoxPort.Name = "textBoxPort";
-            this.textBoxPort.Size = new System.Drawing.Size(71, 20);
-            this.textBoxPort.TabIndex = 2;
-            // 
             // labelDoubleClick
             // 
-            this.labelDoubleClick.Location = new System.Drawing.Point(13, 105);
+            this.labelDoubleClick.Location = new System.Drawing.Point(12, 64);
             this.labelDoubleClick.Name = "labelDoubleClick";
             this.labelDoubleClick.Size = new System.Drawing.Size(194, 47);
             this.labelDoubleClick.TabIndex = 7;
@@ -145,12 +109,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(221, 161);
+            this.ClientSize = new System.Drawing.Size(221, 119);
             this.Controls.Add(this.labelDoubleClick);
-            this.Controls.Add(this.textBoxPort);
-            this.Controls.Add(this.labelPort);
-            this.Controls.Add(this.textBoxIP);
-            this.Controls.Add(this.labelIP);
             this.Controls.Add(this.buttonSave);
             this.Controls.Add(this.textBoxCode);
             this.Controls.Add(this.labelCode);
@@ -177,10 +137,6 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStripIcon;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemSettings;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItemExit;
-        private System.Windows.Forms.Label labelIP;
-        private System.Windows.Forms.TextBox textBoxIP;
-        private System.Windows.Forms.Label labelPort;
-        private System.Windows.Forms.TextBox textBoxPort;
         private System.Windows.Forms.Label labelDoubleClick;
     }
 }

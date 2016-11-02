@@ -61,11 +61,20 @@ namespace Slidecopy {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to hello.
+        ///   Looks up the server ip
         /// </summary>
-        internal static string test {
+        internal static string server_ip {
             get {
-                return ResourceManager.GetString("test", resourceCulture);
+                return ResourceManager.GetString("server_ip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up the server port
+        /// </summary>
+        internal static string server_port {
+            get {
+                return ResourceManager.GetString("server_port", resourceCulture);
             }
         }
     }
