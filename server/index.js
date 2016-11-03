@@ -15,6 +15,8 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
     
 var app = express();
+// turn off X-Powered-By header
+app.disable('x-powered-by');
 
 // handle file upload
 app.post('/upload', upload.single('file'), function(req, res) {
